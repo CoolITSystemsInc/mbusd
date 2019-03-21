@@ -47,17 +47,19 @@ typedef struct
   char dbglvl;
   /* log file name */
   char logname[INTBUFSIZE + 1];
+  /* PID file name */
+  char pidname[INTBUFSIZE + 1];
 #endif
   /* tty port name */
   char ttyport[INTBUFSIZE + 1];
   /* tty speed */
   int ttyspeed;
   /* tty mode */
-  char ttymode[INTBUFSIZE + 1];
-  /* trx control type (0 - ADDC, 1 - by RTS, 2 - by sysfs GPIO with 1 activating transmit, 3 - by sysfs GPIO with 0 activating transmit) */
+  char *ttymode;
+  /* trx control type (0 - ADDC, 1 - by RTS) */
   int trxcntl;
-  /* trx control sysfs file */
-  char trxcntl_file[INTBUFSIZE + 1];
+  /* TCP server binding address */
+  char serverbind[INTBUFSIZE + 1];
   /* TCP server port number */
   int serverport;
   /* maximum number of connections */
@@ -76,8 +78,6 @@ typedef struct
 
 /* Prototypes */
 extern cfg_t cfg;
-extern char cfg_err[];
 void cfg_init(void);
-int cfg_read_file(const char *filename);
 
 #endif /* _CFG_H */

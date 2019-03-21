@@ -4,18 +4,18 @@
  * modbus.h - MODBUS protocol related procedures
  *
  * Copyright (c) 2002-2003, 2013, Victor Antonovich (v.antonovich@gmail.com)
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- *
+ * 
  * - Redistributions of source code must retain the above copyright
  * notice, this list of conditions and the following disclaimer.
- *
+ * 
  * - Redistributions in binary form must reproduce the above copyright
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -38,20 +38,19 @@
 #include "crc16.h"
 
 /*
- * Macro for accessing data in MODBUS frame
+ * Macros for invoking data from MODBUS packet header
  */
-#define MB_FRAME(p, d) ( *(p + d) )
+#define MB_HDR(p, d) ( *(p + d) )
 
 /*
  * MODBUS frame lengths
  */
 #define MB_EX_LEN  3
 #define	MB_MIN_LEN 4
-#define MB_ERR_LEN 5
 #define	MB_MAX_LEN 256
 
 /*
- * Macros for word operations
+ * Macroses for word operations
  */
 #define HIGH(w) ( (unsigned char)(((w) >> 8) & 0xff) )
 #define LOW(w) ( (unsigned char)((w) & 0xff) )
@@ -80,15 +79,7 @@
 #define MB_UNIT_ID    6    /* unit identifier */
 #define MB_FCODE      7    /* function code */
 #define MB_DATA       8    /* MODBUS data */
-#define MB_DATA_ADDR_H MB_DATA    /* MODBUS data: address high byte */
-#define MB_DATA_ADDR_L       9    /* MODBUS data: address low byte */
-#define MB_DATA_NVAL_H      10    /* MODBUS data: number of values high byte */
-#define MB_DATA_NVAL_L      11    /* MODBUS data: number of values low byte */
-#define MB_DATA_NBYTES      12    /* MODBUS data: number of bytes to follow (fc 15,16) */
-
-#define TTY_FCODE_IDX 1    /* The index of the function code in a RTU packet */
-#define TTY_ERR_MASK  0x80 /* The MSB of the response function code indicates an error response */
-
+                      
 /*
  * Exception codes
  */

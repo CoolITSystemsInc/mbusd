@@ -135,8 +135,8 @@ tty_set_attr(ttydata_t *mod)
   mod->tios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
   mod->tios.c_oflag &= ~OPOST;
   mod->tios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+  mod->tios.c_cflag |= CREAD | CLOCAL ;
 #endif
-  mod->tios.c_cflag |= (CREAD | CLOCAL);
   mod->tios.c_cflag &= ~(CSIZE | CSTOPB | PARENB | PARODD | CRTSCTS);
   switch (cfg.ttymode[0])
   {
@@ -306,6 +306,86 @@ tty_transpeed(int speed)
     tspeed = B115200;
     break;
 #endif
+
+/* Added 11/07/2017 -- Renee Cousins, support more baud rates */
+#if defined(B230400)
+  case 230400:
+    tspeed = B230400;
+    break;
+
+#endif
+#if defined(B460800)
+  case 460800:
+    tspeed = B460800;
+    break;
+
+#endif
+#if defined(B500000)
+  case 500000:
+    tspeed = B500000;
+    break;
+
+#endif
+#if defined(B576000)
+  case 576000:
+    tspeed = B576000;
+    break;
+
+#endif
+#if defined(B921600)
+  case 921600:
+    tspeed = B921600;
+    break;
+
+#endif
+#if defined(B1000000)
+  case 1000000:
+    tspeed = B1000000;
+    break;
+
+#endif
+#if defined(B1152000)
+  case 1152000:
+    tspeed = B1152000;
+    break;
+
+#endif
+#if defined(B1500000)
+  case 1500000:
+    tspeed = B1500000;
+    break;
+
+#endif
+#if defined(B2000000)
+  case 2000000:
+    tspeed = B2000000;
+    break;
+
+#endif
+#if defined(B2500000)
+  case 2500000:
+    tspeed = B2500000;
+    break;
+
+#endif
+#if defined(B3000000)
+  case 3000000:
+    tspeed = B3000000;
+    break;
+
+#endif
+#if defined(B3500000)
+  case 3500000:
+    tspeed = B3500000;
+    break;
+
+#endif
+#if defined(B4000000)
+  case 4000000:
+    tspeed = B4000000;
+    break;
+#endif
+
   default:
     tspeed = DEFAULT_BSPEED;
     break;
@@ -319,6 +399,8 @@ tty_transpeed(int speed)
 int
 tty_cooked(ttydata_t *mod)
 {
+  signal(SIGHUP, SIG_IGN);
+  signal(SIGPIPE, SIG_IGN);
   if (!isatty(mod->fd))
     return RC_ERR;
   if (tcsetattr(mod->fd, TCSAFLUSH, &mod->savedtios))
@@ -338,7 +420,8 @@ tty_close(ttydata_t *mod)
 #endif
   if (mod->fd < 0)
     return RC_ACLOSE;       /* already closed */
-  tty_cooked(mod);
+  if (tty_cooked(mod))
+    return RC_ERR;
 #ifdef HAVE_LIBUTIL
   if (close(mod->fd))
     return RC_ERR;
@@ -359,44 +442,20 @@ tty_close(ttydata_t *mod)
 }
 
 #ifdef  TRXCTL
-void sysfs_gpio_set(char *filename, char *value) {
-	int fd;
-
-	fd = open(filename, O_WRONLY);
-	/* write first byte. Should only be 0 or 1 */
-	write(fd, value, 1);
-	close(fd);
-
-	logw(9, "tty: sysfs_gpio_set(%s,%s)\n",filename,value);
-
-}
-
 /* Set RTS line to active state */
 void
 tty_set_rts(int fd)
 {
-	if ( TRX_RTS == cfg.trxcntl ) {
-		int mstat = TIOCM_RTS;
-		ioctl(fd, TIOCMBIS, &mstat);
-	} else if ( TRX_SYSFS_1 == cfg.trxcntl) {
-		sysfs_gpio_set(cfg.trxcntl_file,"1");
-	} else if ( TRX_SYSFS_0 == cfg.trxcntl) {
-		sysfs_gpio_set(cfg.trxcntl_file,"0");
-	}
+  int mstat = TIOCM_RTS;
+  ioctl(fd, TIOCMBIS, &mstat);
 }
 
 /* Set RTS line to passive state */
 void
 tty_clr_rts(int fd)
 {
-	if ( TRX_RTS == cfg.trxcntl ) {
-		int mstat = TIOCM_RTS;
-		ioctl(fd, TIOCMBIC, &mstat);
-	} else if ( TRX_SYSFS_1 == cfg.trxcntl) {
-		sysfs_gpio_set(cfg.trxcntl_file,"0");
-	} else if ( TRX_SYSFS_0 == cfg.trxcntl) {
-		sysfs_gpio_set(cfg.trxcntl_file,"1");
-	}
+  int mstat = TIOCM_RTS;
+  ioctl(fd, TIOCMBIC, &mstat);
 }
 #endif
 

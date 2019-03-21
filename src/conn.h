@@ -46,37 +46,13 @@
 /*
  * Default values
  */
+#define DEFAULT_SERVERBIND "127.0.0.1"
 #define DEFAULT_SERVERPORT 502
 #define DEFAULT_MAXCONN 32
 #define DEFAULT_MAXTRY 3
 #define DEFAULT_RQSTPAUSE 100
 #define DEFAULT_RESPWAIT 500
-#define DEFAULT_CONNTIMEOUT 60
-
-/* Max simultaneous TCP connections to server */
-#ifndef MAX_MAXCONN
-#  define MAX_MAXCONN 128
-#endif
-
-/* Max RTU device request retries */
-#ifndef MAX_MAXTRY
-#  define MAX_MAXTRY 15
-#endif
-
-/* Max RTU device pause between requests, in msecs */
-#ifndef MAX_RQSTPAUSE
-#  define MAX_RQSTPAUSE 10000
-#endif
-
-/* Max RTU device response wait, in msecs */
-#ifndef MAX_RESPWAIT
-#  define MAX_RESPWAIT 10000
-#endif
-
-/* Max connection timeout, in secs */
-#ifndef MAX_CONNTIMEOUT
-#  define MAX_CONNTIMEOUT 1000
-#endif
+#define DEFAULT_CONNTIMEOUT 600
 
 #define CRCSIZE 2       /* size (in bytes) of CRC */
 #define HDRSIZE 6       /* size (in bytes) of header */
@@ -86,12 +62,10 @@
 /*
  * Client connection FSM states
  */
-#define CONN_HEADER    0  /* reading frame header */
-#define CONN_RQST_FUNC 1  /* reading request function code */
-#define CONN_RQST_NVAL 2  /* reading request number of values (registers/coils) */
-#define CONN_RQST_TAIL 3  /* reading request tail */
-#define CONN_TTY       4  /* writing request to TTY */
-#define CONN_RESP      5  /* reading response from TTY */
+#define CONN_HEADER 0
+#define CONN_RQST   1
+#define CONN_TTY    2
+#define CONN_RESP   3
 
 /*
  * Client connection related data storage structure
@@ -105,7 +79,6 @@ typedef struct conn_t
   int timeout;          /* timeout value, secs */
   struct sockaddr_in sockaddr; /* connection structure */
   int ctr;              /* counter of data in the buffer */
-  int read_len;         /* length of modbus frame to read */
   unsigned char buf[HDRSIZE + BUFSIZE];    /* data buffer */
 } conn_t;
 

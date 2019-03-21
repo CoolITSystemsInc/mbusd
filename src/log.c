@@ -32,18 +32,32 @@
  */
 
 #include "log.h"
+#include "sys/syslog.h"
 
 #ifdef LOG
 #include "cfg.h"
 
 /* log file full name */
 char logfullname[INTBUFSIZE + 1];
+int syslogging;
 
 int
 log_init(char *logname)
 {
   FILE *logfile;
   int maxlen = INTBUFSIZE;
+
+  if ((logname[0] == 's')
+  &&  (logname[1] == 'y')
+  &&  (logname[2] == 's')
+  &&  (logname[3] == 'l')
+  &&  (logname[4] == 'o')
+  &&  (logname[5] == 'g')) {
+    syslogging = 1;
+    return RC_OK;
+  } else {
+    syslogging = 0;
+  }
 
   /* checking log file name */
   if (*logname == '/')
@@ -101,6 +115,13 @@ logw(int level, char *fmt, ...)
   static char str[INTBUFSIZE + 1] = {0}, *p;
 
   if (level > cfg.dbglvl) return;
+  if (syslogging) {
+    va_start(args,fmt);
+    vsnprintf( str, INTBUFSIZE, fmt, args );
+    va_end(args);
+    syslog( LOG_MAKEPRI(LOG_USER,level), str );
+    return;
+  }
 #ifdef HRDATE
   tt = time(NULL);
   t = localtime(&tt);
@@ -114,7 +135,7 @@ logw(int level, char *fmt, ...)
   strsize += vsnprintf(p, INTBUFSIZE - strsize, fmt, args);
   va_end(args);
   strcpy(str + strsize++, "\n");
-  if (!isdaemon) fprintf(stderr, "%s", str);
+  if (!isdaemon) printf("%s", str);
   if (*logfullname == '\0') return;
   log_app(logfullname, str);
 }
