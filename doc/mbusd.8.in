@@ -1,27 +1,21 @@
-.TH "mbusd" 8 "11 Dec 2017" "mbusd @PROJECT_VERSION@"
+.TH "mbusd" 8 "18 Dec 2015" "mbusd @VERSION@"
 .SH NAME
 mbusd \- MODBUS/TCP to MODBUS/RTU gateway.
 .SH SYNOPSIS
 .B mbusd
 .RB [ -h ]
 .RB [ -d ]
-.RB [ -L
-.IR logfile ]
+.RB [ -t ]
 .RB [ -v
 .IR level ]
-.RB [ -c
-.IR cfgfile ]
+.RB [ -L
+.IR logfile ]
 .RB [ -p
 .IR device ]
 .RB [ -s
 .IR speed ]
 .RB [ -m
 .IR mode ]
-.RB [ -t ]
-.RB [ -y
-.IR file ]
-.RB [ -Y
-.IR file ]
 .RB [ -P
 .IR port ]
 .RB [ -C
@@ -35,22 +29,22 @@ mbusd \- MODBUS/TCP to MODBUS/RTU gateway.
 .RB [ -T
 .IR timeout ]
 .SH DESCRIPTION
-\fImbusd\fR is MODBUS/TCP to MODBUS/RTU gateway.
+\fImbusd\fR is MODBUS/TCP to MODBUS/RTU gateway. Currently only master mode is implemented.
 .SH OPTIONS
 .IP \fB-h\fR
 Usage help.
 .IP \fB-d\fR
 Instruct \fImbusd\fR not to fork itself (non-daemonize).
-.IP "\fB-L \fIlogfile\fR"
-Specifies log file name ('-' for logging to STDOUT only, default is /var/log/mbusd.log).
+.IP \fB-t\fR
+Enable RTS RS-485 data direction control (if not disabled while compile).
 .IP "\fB-v \fIlevel\fR"
 Specifies log verbosity level. 0 enables logging of errors only,
 1 also enables warnings and 2 enables information messages.
-If \fImbusd\fR was compiled in debug mode, valid log levels are up to 9,
+If \fImbusd\fR was compiled in debug mode, valid log levels is up to 9,
 where log levels above 2 forces logging of information about additional
 internal events.
-.IP "\fB-c \fIcfgfile\fR"
-Read configuration from cfgfile.
+.IP "\fB-L \fIlogfile\fR"
+Specifies log file name ('-' for logging to STDOUT only, default /var/log/mbusd.log).
 .IP "\fB-p \fIdevice\fR"
 Specifies serial port device name.
 .IP "\fB-s \fIspeed\fR"
@@ -59,14 +53,6 @@ Specifies serial port speed.
 Specifies serial port mode (like 8N1).
 .IP "\fB-P \fIport\fR"
 Specifies TCP port number.
-.IP \fB-t\fR
-Enable RTS RS-485 data direction control (if not disabled while compile).
-.IP "\fB-y \fIfile\fR"
-Enable RS-485 direction data direction control by writing '1' to file
-for transmitter enable and '0' to file for transmitter disable
-.IP "\fB-Y \fIfile\fR"
-Enable RS-485 direction data direction control by writing '0' to file
-for transmitter enable and '1' to file for transmitter disable
 .IP "\fB-C \fImaxconn\fR"
 Specifies maximum number of simultaneous TCP connections.
 .IP "\fB-N \fIretries\fR"
@@ -91,4 +77,5 @@ Victor Antonovich <v.antonovich@gmail.com>
 
 Andrew Denysenko <nitr0@seti.kr.ua>
 .SH LICENSE
-This program is distributed under BSD license. See LICENSE file in the installation directory for the full license text.
+This program is distributed under the BSD-like license, included in
+each source file. See also COPYING file in the installation directory.

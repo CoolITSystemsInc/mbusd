@@ -1,0 +1,348 @@
+cfg.c: * OpenMODBUS/TCP to RS-232/485 MODBUS RTU gateway
+cfg.c: * cfg.c - configuration related procedures
+cfg.c: * Copyright (c) 2002-2003, 2013, Victor Antonovich (v.antonovich@gmail.com)
+cfg.c: * - Redistributions of source code must retain the above copyright
+cfg.c: * - Redistributions in binary form must reproduce the above copyright
+conn.c: * OpenMODBUS/TCP to RS-232/485 MODBUS RTU gateway
+conn.c: * conn.c - connections management procedures
+conn.c: * Copyright (c) 2002-2003, 2013, 2015 Victor Antonovich (v.antonovich@gmail.com)
+conn.c: * - Redistributions of source code must retain the above copyright
+conn.c: * - Redistributions in binary form must reproduce the above copyright
+conn.c:  logw(3, "tty closed, re-opening...");
+conn.c:  logw(3, "re-init ok...");
+conn.c:  newconn->sd = sd;
+conn.c:  memcpy((void *) &newconn->sockaddr,
+conn.c: * Parameters: CONN - ptr to connection to close
+conn.c:         inet_ntoa(conn->sockaddr.sin_addr));
+conn.c:  close(conn->sd);
+conn.c: * Parameters: TTY - ptr to tty structure,
+conn.c: *             CONN - ptr to active connection
+conn.c:  (void)memcpy((void *)tty->txbuf,
+conn.c:               (void *)(conn->buf + HDRSIZE),
+conn.c:               MB_HDR(conn->buf, MB_LENGTH_L));
+conn.c:  modbus_crc_write(tty->txbuf, MB_HDR(conn->buf, MB_LENGTH_L));
+conn.c:  tty->txlen = MB_HDR(conn->buf, MB_LENGTH_L) + CRCSIZE;
+conn.c:  } while (rc == -1 && errno == EINTR);
+conn.c:  } while (rc == -1 && errno == EINTR);
+conn.c:      delay = DV(nbytes, cfg.ttyspeed) -
+conn.c:        ((tts.tv_sec * 1000000l + tts.tv_usec) - (ts.tv_sec * 1000000l + ts.tv_usec));
+conn.c:    delay = DV(nbytes, cfg.ttyspeed) -
+conn.c:      ((tts.tv_sec * 1000000l + tts.tv_usec) - (ts.tv_sec * 1000000l + ts.tv_usec));
+conn.c:/*    tcdrain(d); - hangs sometimes, so make calculated delay */
+conn.c:  } while (rc == -1 && errno == EINTR);
+conn.c:    while (len--)
+conn.c:      switch (curconn->state)
+conn.c:          FD_MSET(curconn->sd, &sdsetrd);
+conn.c:          FD_MSET(curconn->sd, &sdsetwr);
+conn.c:      min_timeout = MIN(min_timeout, curconn->timeout);
+conn.c:    { /* tty.timer is non-zero in TTY_PAUSE, TTY_RESP states */
+conn.c:    tval = 1000000ul * (tts.tv_sec - ts.tv_sec) +
+conn.c:                       (tts.tv_usec - ts.tv_usec);
+conn.c:            /* inter-request pause elapsed */
+conn.c:                modbus_ex_write(actconn->buf, MB_EX_TIMEOUT);
+conn.c:                       cfg.maxtry - tty.trynum + 1, cfg.maxtry);
+conn.c:                     modbus_crc_correct(tty.rxbuf + tty.rxoffset, tty.ptrbuf - tty.rxoffset))
+conn.c:                (void)memcpy((void *)(actconn->buf + HDRSIZE),
+conn.c:                             (void *)(tty.rxbuf + tty.rxoffset), tty.ptrbuf - CRCSIZE - tty.rxoffset);
+conn.c:                WORD_WR_BE(actconn->buf + MB_LENGTH_H, tty.ptrbuf - CRCSIZE - tty.rxoffset);
+conn.c:                  modbus_ex_write(actconn->buf, MB_EX_CRC);
+conn.c:                         cfg.maxtry - tty.trynum + 1, cfg.maxtry);
+conn.c:            /* make inter-request pause */
+conn.c:        tty.timer -= tval;
+conn.c:        while (len--)
+conn.c:          curconn->timeout -= tout_sec;
+conn.c:          if (curconn->timeout <= 0)
+conn.c:            if (curconn->state == CONN_TTY)
+conn.c:                     inet_ntoa(curconn->sockaddr.sin_addr));
+conn.c:                   inet_ntoa(curconn->sockaddr.sin_addr));
+conn.c:                        tty.txlen - tty.ptrbuf, 1);
+conn.c:        { /* error - make attempt to reinitialize serial port */
+conn.c:        if (tty.rxlen - tty.ptrbuf + tty.rxoffset <= 0) {
+conn.c:                       tty.rxlen - tty.ptrbuf + tty.rxoffset);
+conn.c:        { /* error - make attempt to reinitialize serial port */
+conn.c:        if (tty.ptrbuf - tty.rxoffset < 3 && tty.ptrbuf - tty.rxoffset + rc >= 3) {
+conn.c:          /* we received more than 3 bytes from header - address, request id and bytes count */
+conn.c:            for (i = 0; i < tty.ptrbuf - tty.rxoffset + rc - 1; i++) {
+conn.c:              i = TTY_BUFSIZE - tty.rxoffset;
+conn.c:        { /* error - make attempt to reinitialize serial port */
+conn.c:         modbus_crc_correct(tty.rxbuf + tty.rxoffset, tty.ptrbuf - tty.rxoffset))
+conn.c:        (void)memcpy((void *)(actconn->buf + HDRSIZE),
+conn.c:                     (void *)(tty.rxbuf + tty.rxoffset), tty.ptrbuf - CRCSIZE - tty.rxoffset);
+conn.c:        WORD_WR_BE(actconn->buf + MB_LENGTH_H, tty.ptrbuf - CRCSIZE - tty.rxoffset);
+conn.c:        /* make inter-request pause */
+conn.c:          modbus_ex_write(actconn->buf, MB_EX_CRC);
+conn.c:          /* make inter-request pause */
+conn.c:                 cfg.maxtry - tty.trynum + 1, cfg.maxtry);
+conn.c:    while (len--)
+conn.c:      switch (curconn->state)
+conn.c:          if (FD_ISSET(curconn->sd, &sdsetrd))
+conn.c:            rc = conn_read(curconn->sd,
+conn.c:                           curconn->buf + curconn->ctr,
+conn.c:                           RQSTSIZE - curconn->ctr);
+conn.c:            { /* error - drop this connection and go to next queue element */
+conn.c:            curconn->ctr += rc;
+conn.c:            if (curconn->state == CONN_HEADER)
+conn.c:              if (curconn->ctr >= HDRSIZE)
+conn.c:                if (modbus_check_header(curconn->buf) != RC_OK)
+conn.c:            if (curconn->state == CONN_RQST)
+conn.c:              if (curconn->ctr >=
+conn.c:                    HDRSIZE + MB_HDR(curconn->buf, MB_LENGTH_L))
+conn.c:          if (FD_ISSET(curconn->sd, &sdsetwr))
+conn.c:            rc = conn_write(curconn->sd,
+conn.c:                            curconn->buf + curconn->ctr,
+conn.c:                            MB_HDR(curconn->buf, MB_LENGTH_L) +
+conn.c:                            HDRSIZE - curconn->ctr, 0);
+conn.c:            { /* error - drop this connection and go to next queue element */
+conn.c:            curconn->ctr += rc;
+conn.c:            if (curconn->ctr == (MB_HDR(curconn->buf, MB_LENGTH_L) + HDRSIZE))
+conn.c:      } /* switch (curconn->state) */
+conn.c:    } /* while (len--) */
+crc16.c: * OpenMODBUS/TCP to RS-232/485 MODBUS RTU gateway
+crc16.c: * crc16.c - Cyclic Redundant Checks calculating
+crc16.c: * Copyright (c) 2002-2003, 2013, Victor Antonovich (v.antonovich@gmail.com)
+crc16.c: * - Redistributions of source code must retain the above copyright
+crc16.c: * - Redistributions in binary form must reproduce the above copyright
+crc16.c:  while (bsize--)
+log.c: * OpenMODBUS/TCP to RS-232/485 MODBUS RTU gateway
+log.c: * log.c - debug logging facility
+log.c: * Copyright (c) 2002-2003, 2013, Victor Antonovich (v.antonovich@gmail.com)
+log.c: * - Redistributions of source code must retain the above copyright
+log.c: * - Redistributions in binary form must reproduce the above copyright
+log.c:    maxlen -= strlen(logfullname);
+log.c:  strsize += vsnprintf(p, INTBUFSIZE - strsize, fmt, args);
+main.c: * OpenMODBUS/TCP to RS-232/485 MODBUS RTU gateway
+main.c: * main.c - main module
+main.c: * Copyright (c) 2002-2003, 2013, Victor Antonovich (v.antonovich@gmail.com)
+main.c: * - Redistributions of source code must retain the above copyright
+main.c: * - Redistributions in binary form must reproduce the above copyright
+main.c:int server_sd = -1;
+main.c:    case -1:
+main.c:      return (-1);
+main.c:  if (setsid() == -1)
+main.c:    return (-1);
+main.c:  if (!noclose && (fd = _open("/dev/null", O_RDWR, 0)) != -1) {
+main.c:  printf("%s-%s Copyright (C) 2002-2003, 2011, 2013, 2015 Victor Antonovich <v.antonovich@gmail.com>, "
+main.c:   "Usage: %s [-h] [-d] "
+main.c:   "[-t] "
+main.c:   "[-v level] [-L logfile] [-p device] [-s speed] [-m mode] [-A ip] [-P port]\n"
+main.c:   "             [-C maxconn] [-N retries] [-R pause] [-W wait] [-T timeout] [-I pid]\n\n"
+main.c:   "  -h         : this help\n"
+main.c:   "  -d         : don't daemonize\n"
+main.c:   "  -I pid     : path to register PID to\n"
+main.c:   "  -t         : enable RTS RS-485 data direction control\n"
+main.c:   "  -v level   : set log level (0-9, default %d, 0 - errors only)\n"
+main.c:   "  -v level   : set log level (0-2, default %d, 0 - errors only)\n"
+main.c:   "  -L logfile : set log file name (default %s%s, \n"
+main.c:   "               '-' for logging to STDOUT only)\n"
+main.c:   "  -p device  : set serial port device name (default %s)\n"
+main.c:   "  -s speed   : set serial port speed (default %d)\n"
+main.c:   "  -m mode    : set serial port mode (default %s)\n"
+main.c:   "  -A ip      : bind to the specified IP Address (default %s)\n"
+main.c:   "  -P port    : set TCP server port number (default %d)\n"
+main.c:   "  -C maxconn : set maximum number of simultaneous TCP connections\n"
+main.c:   "               (1-128, default %d)\n"
+main.c:   "  -N retries : set maximum number of request retries\n"
+main.c:   "               (0-15, default %d, 0 - without retries)\n"
+main.c:   "  -R pause   : set pause between requests in milliseconds\n"
+main.c:   "               (1-10000, default %lu)\n"
+main.c:   "  -W wait    : set response wait time in milliseconds\n"
+main.c:   "               (1-10000, default %lu)\n"
+main.c:   "  -T timeout : set connection timeout value in seconds\n"
+main.c:   "               (0-1000, default %d, 0 - no timeout)"
+main.c:        exit(-1);
+main.c:          printf("%s: -v: invalid loglevel value"
+main.c:                 " (%d, must be 0-9)\n", exename, cfg.dbglvl);
+main.c:          printf("%s: -v: invalid loglevel value"
+main.c:                 " (%d, must be 0-2)\n", exename, cfg.dbglvl);
+main.c:          exit(-1);
+main.c:          if (*optarg == '-')
+main.c:                    INTBUFSIZE - strlen(cfg.logname));
+main.c:		if(access(ttys[0], R_OK) != -1) {
+main.c:		else if(access(ttys[1], R_OK) != -1) {
+main.c:			exit(-1);
+main.c:                  INTBUFSIZE - strlen(cfg.ttyport));
+main.c:	  printf("%s: -m: invalid serial port mode ('%s')\n", exename, cfg.ttymode);
+main.c:	  exit(-1);
+main.c:	  printf("%s: -m: invalid serial port character size "
+main.c:	  exit(-1);
+main.c:	  printf("%s: -m: invalid serial port parity "
+main.c:	  exit(-1);
+main.c:	  printf("%s: -m: invalid serial port stop bits "
+main.c:	  exit(-1);
+main.c:	  exit(-1);
+main.c:          printf("%s: -C: invalid maxconn value"
+main.c:                 " (%d, must be 1-128)\n", exename, cfg.maxconn);
+main.c:          exit(-1);
+main.c:          printf("%s: -N: invalid maxtry value"
+main.c:                 " (%d, must be 0-15)\n", exename, cfg.maxtry);
+main.c:          exit(-1);
+main.c:          printf("%s: -R: invalid inter-request pause value"
+main.c:                 " (%lu, must be 1-10000)\n", exename, cfg.rqstpause);
+main.c:          exit(-1);
+main.c:          printf("%s: -W: invalid response wait time value"
+main.c:                 " (%lu, must be 1-10000)\n", exename, cfg.respwait);
+main.c:          exit(-1);
+main.c:          printf("%s: -T: invalid conn timeout value"
+main.c:                 " (%d, must be 1-1000)\n", exename, cfg.conntimeout);
+main.c:          exit(-1);
+main.c:    exit(-1);
+main.c:  logw(2, "%s-%s started...", PACKAGE, VERSION);
+main.c:    if (fd != -1) PID = fdopen( fd, "w" );
+main.c:      exit(-1);
+main.c:  logw(2, "%s-%s exited...", PACKAGE, VERSION);
+modbus.c: * OpenMODBUS/TCP to RS-232/485 MODBUS RTU gateway
+modbus.c: * modbus.c - MODBUS protocol related procedures
+modbus.c: * Copyright (c) 2002-2003, 2013, Victor Antonovich (v.antonovich@gmail.com)
+modbus.c: * - Redistributions of source code must retain the above copyright
+modbus.c: * - Redistributions in binary form must reproduce the above copyright
+modbus.c: * Parameters: FRAME - address of the frame,
+modbus.c: *             LEN   - frame length;
+modbus.c: *         non-zero otherwise
+modbus.c: * Parameters: FRAME - address of the frame,
+modbus.c: *             LEN   - frame length;
+modbus.c: * Parameters: PACKET - address of the request packet,
+modbus.c: *             CODE - exception code;
+modbus.c: * Parameters: HEADER - address of the header
+queue.c: * OpenMODBUS/TCP to RS-232/485 MODBUS RTU gateway
+queue.c: * queue.c - �onnections queue management procedures
+queue.c: * Copyright (c) 2002-2003, 2013, Victor Antonovich (v.antonovich@gmail.com)
+queue.c: * - Redistributions of source code must retain the above copyright
+queue.c: * - Redistributions in binary form must reproduce the above copyright
+queue.c:  queue->beg = NULL;
+queue.c:  queue->end = NULL;
+queue.c:  queue->len = 0;
+queue.c:  newconn->next = NULL;
+queue.c:  if ((newconn->prev = queue->end) != NULL)
+queue.c:    queue->end->next = newconn;
+queue.c:    queue->beg = newconn;
+queue.c:  queue->end = newconn;
+queue.c:  queue->len++;
+queue.c:  logw(5, "queue_new_elem(): length now is %d", queue->len);
+queue.c:  if (queue->len <= 0)
+queue.c:  if (conn->prev == NULL)
+queue.c:    if ((queue->beg = queue->beg->next) != NULL)
+queue.c:      queue->beg->prev = NULL;
+queue.c:    conn->prev->next = conn->next;
+queue.c:  if (conn->next == NULL)
+queue.c:    if ((queue->end = queue->end->prev) != NULL)
+queue.c:      queue->end->next = NULL;
+queue.c:    conn->next->prev = conn->prev;
+queue.c:  queue->len--;
+queue.c:  logw(5, "queue_delete_elem(): length now is %d", queue->len);
+queue.c: * Parameters: CONN - pointer to current queue element
+queue.c:  return (conn->next == NULL) ? queue->beg : conn->next;
+sig.c: * OpenMODBUS/TCP to RS-232/485 MODBUS RTU gateway
+sig.c: * sig.c - signals management procedures
+sig.c: * Copyright (c) 2002-2003, 2013, Victor Antonovich (v.antonovich@gmail.com)
+sig.c: * - Redistributions of source code must retain the above copyright
+sig.c: * - Redistributions in binary form must reproduce the above copyright
+sock.c: * OpenMODBUS/TCP to RS-232/485 MODBUS RTU gateway
+sock.c: * sock.c - socket manipulation routines
+sock.c: * Copyright (c) 2002-2003, 2013, Victor Antonovich (v.antonovich@gmail.com)
+sock.c: * - Redistributions of source code must retain the above copyright
+sock.c: * - Redistributions in binary form must reproduce the above copyright
+sock.c: * Bring i/o descriptor SD to BLKMODE (if non-zero - socket is nonblocking)
+sock.c:  if (flags == -1) return -1;
+sock.c: * Create new socket in BLKMODE mode (if non-zero - socket is nonblocking)
+sock.c:         socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
+sock.c:  if (sock_set_blkmode(sock, blkmode) == -1)
+sock.c: * Create new server socket with SERVER_PORT, SERVER_IP -
+sock.c: * BLKMODE - blocking mode (if non-zero - socket is nonblocking)
+sock.c:  if (fcntl(server_s, F_SETFD, 1) == -1)
+sock.c:           " can't set close-on-exec on socket (%s)",
+sock.c:		          sizeof(sock_opt)) == -1)
+sock.c:		          sizeof(sock_opt)) == -1) ||
+sock.c:		          sizeof(sock_opt)) == -1))
+sock.c:	   sizeof(server_sockaddr)) == -1)
+sock.c:  if (listen(server_s, BACKLOG) == -1)
+sock.c: * Accept connection from SERVER_SD - server socket descriptor
+sock.c: * (if non-zero - socket is nonblocking)
+sock.c: *         RMT_ADDR - ptr to connection info structure
+sock.c:  if (sd == -1)
+sock.c:		          sizeof(sock_opt)) == -1) ||
+sock.c:		          sizeof(sock_opt)) == -1))
+state.c: * OpenMODBUS/TCP to RS-232/485 MODBUS RTU gateway
+state.c: * state.c - state management procedures
+state.c: * Copyright (c) 2002-2003, 2013, Victor Antonovich (v.antonovich@gmail.com)
+state.c: * - Redistributions of source code must retain the above copyright
+state.c: * - Redistributions in binary form must reproduce the above copyright
+state.c: * Parameters: CONN - ptr to queue element
+state.c: *             (if NULL - search from queue begin),
+state.c: *             QUEUE - ptr to the queue;
+state.c:  int len = queue->len;
+state.c:  if (!queue->len) return NULL;
+state.c:    conn = queue->beg;
+state.c:  while (len--)
+state.c:    if (conn->state == state)
+state.c:      conn->ctr = 0;
+state.c:             inet_ntoa(conn->sockaddr.sin_addr));
+state.c:             inet_ntoa(conn->sockaddr.sin_addr));
+state.c:             inet_ntoa(conn->sockaddr.sin_addr));
+state.c:      conn->ctr = 0;
+state.c:             inet_ntoa(conn->sockaddr.sin_addr));
+state.c:      logw(5, "conn_set_state([%s]) - invalid state (%d)",
+state.c:             inet_ntoa(conn->sockaddr.sin_addr), state);
+state.c:      exit (-1);
+state.c:  conn->state = state;
+state.c:  conn->timeout = cfg.conntimeout;
+state.c:      mod->trynum = 0;
+state.c:      mod->timer = (unsigned long)cfg.rqstpause * 1000l;
+state.c:      mod->trynum = 0;
+state.c:      mod->timer = 0l;
+state.c:      mod->ptrbuf = 0;
+state.c:      mod->timer = 0l;
+state.c:      mod->trynum = mod->trynum ? mod->trynum - 1 : (unsigned)cfg.maxtry;
+state.c:      mod->ptrbuf = 0;
+state.c:      mod->rxoffset = 0;
+state.c:      mod->rxlen = TTY_BUFSIZE;
+state.c:      mod->timer = cfg.respwait * 1000l + DV(mod->txlen, mod->speed);
+state.c:      logw(5, "tty_set_state() - invalid state (%d)", state);
+state.c:      exit (-1);
+state.c:  mod->state = state;
+tty.c: * OpenMODBUS/TCP to RS-232/485 MODBUS RTU gateway
+tty.c: * tty.c - terminal I/O related procedures
+tty.c: * Copyright (c) 2002-2003, 2013, Victor Antonovich (v.antonovich@gmail.com)
+tty.c: * - Redistributions of source code must retain the above copyright
+tty.c: * - Redistributions in binary form must reproduce the above copyright
+tty.c:  mod->fd = -1;
+tty.c:  mod->port = port;
+tty.c:  mod->speed = speed;
+tty.c:  mod->trxcntl = trxcntl;
+tty.c:  char *ttyname = tty_get_name(mod->port);
+tty.c:  if (mod->fd > 0)
+tty.c:  mod->fd = open(mod->port, O_RDWR | O_NONBLOCK | O_NOCTTY);
+tty.c:  if (mod->fd < 0)
+tty.c:  speed_t tspeed = tty_transpeed(mod->speed);
+tty.c:  memset(&mod->savedtios, 0, sizeof(struct termios));
+tty.c:  if (tcgetattr(mod->fd, &mod->savedtios))
+tty.c:  memcpy(&mod->tios, &mod->savedtios, sizeof(mod->tios));
+tty.c:  cfmakeraw(&mod->tios);
+tty.c:  mod->tios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
+tty.c:  mod->tios.c_oflag &= ~OPOST;
+tty.c:  mod->tios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+tty.c:  mod->tios.c_cflag |= CREAD | CLOCAL ;
+tty.c:  mod->tios.c_cflag &= ~(CSIZE | CSTOPB | PARENB | PARODD | CRTSCTS);
+tty.c:      mod->tios.c_cflag |= CS5;
+tty.c:      mod->tios.c_cflag |= CS6;
+tty.c:      mod->tios.c_cflag |= CS7;
+tty.c:      mod->tios.c_cflag |= CS8;
+tty.c:      mod->tios.c_cflag |= PARENB;
+tty.c:      mod->tios.c_cflag |= (PARENB | PARODD);
+tty.c:      mod->tios.c_cflag |= CSTOPB;
+tty.c:  mod->tios.c_cc[VTIME] = 0;
+tty.c:  mod->tios.c_cc[VMIN] = 1;
+tty.c:  cfsetspeed(&mod->tios, tspeed);
+tty.c:  cfsetispeed(&mod->tios, tspeed);
+tty.c:  cfsetospeed(&mod->tios, tspeed);
+tty.c:  if (tcsetattr(mod->fd, TCSANOW, &mod->tios))
+tty.c:  tcflush(mod->fd, TCIOFLUSH);
+tty.c:  tty_clr_rts(mod->fd);
+tty.c:  flag = fcntl(mod->fd, F_GETFL, 0);
+tty.c:  return fcntl(mod->fd, F_SETFL, flag | O_NONBLOCK);
+tty.c:  if (!isatty(mod->fd))
+tty.c:  if (tcsetattr(mod->fd, TCSAFLUSH, &mod->savedtios))
+tty.c:  char *ttyname = tty_get_name(mod->port);
+tty.c:  if (mod->fd < 0)
+tty.c:  if (close(mod->fd))
+tty.c:  return close(mod->fd);
+tty.c:    ts = 1000000 * (ttv.tv_sec - tv.tv_sec) + (ttv.tv_usec - tv.tv_usec);
