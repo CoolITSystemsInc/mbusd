@@ -10,7 +10,7 @@ on:
       - main
 
 env:
-  xcompile_vars: 'CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ INCLUDE="-I/usr/arm-linux-gnueabihf/include/"'
+  xcompile_vars: 'CC=arm-linux-musleabihf-gcc CXX=arm-linux-musleabihf-g++ INCLUDE="-I/usr/arm-linux-musleabihf/include/"'
 
 jobs:
   build-mbusd:
@@ -21,20 +21,20 @@ jobs:
 
     - name: Set up cross-compiler
       run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+        wget https://musl.cc/arm-linux-musleabihf-cross.tgz
+        tar -zxf arm-linux-musleabihf-cross.tgz
+        sudo cp -r arm-linux-musleabihf-cross/* /usr/
 
     - name: Compile mbusd
       run: |
         chmod +x *
         autoreconf -if
-        ./configure --prefix=/usr/arm-linux-gnueabihf/
-        sudo make
-        sudo make install
-        ls -al /usr/arm-linux-gnueabihf/bin/
+        ./configure --prefix=/usr/arm-linux-musleabihf/ --host=arm-linux-musleabihf
+        sudo make install ${{ env.xcompile_vars }}
+        ls -alR /usr/arm-linux-musleabihf/
     
     - name: Upload mbusd binary
       uses: actions/upload-artifact@v2
       with:
         name: mbusd
-        path: /usr/arm-linux-gnueabihf/bin/mbusd
+        path: /usr/arm-linux-musleabihf/bin/mbusd
