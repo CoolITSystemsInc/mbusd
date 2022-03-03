@@ -1,0 +1,40 @@
+name: Build mbusd
+
+on:
+  push:
+    branches:
+      - main
+      - cicd
+  pull_request:
+    branches:
+      - main
+
+env:
+  xcompile_vars: 'CC=arm-linux-musleabihf-gcc CXX=arm-linux-musleabihf-g++ INCLUDE="-I/usr/arm-linux-musleabihf/include/"'
+
+jobs:
+  build-mbusd:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up cross-compiler
+      run: |
+        wget https://musl.cc/arm-linux-musleabihf-cross.tgz
+        tar -zxf arm-linux-musleabihf-cross.tgz
+        sudo cp -r arm-linux-musleabihf-cross/* /usr/
+
+    - name: Compile mbusd
+      run: |
+        chmod +x *
+        autoreconf -if
+        ./configure --prefix=/usr/arm-linux-musleabihf/ --host=arm-linux-musleabihf
+        sudo make install ${{ env.xcompile_vars }}
+        ls -alR /usr/arm-linux-musleabihf/
+    
+    - name: Upload mbusd binary
+      uses: actions/upload-artifact@v2
+      with:
+        name: mbusd
+        path: /usr/arm-linux-musleabihf/bin/mbusd
