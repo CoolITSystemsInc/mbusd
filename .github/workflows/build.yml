@@ -8,7 +8,8 @@ on:
   pull_request:
     branches:
       - master
-
+  workflow_dispatch:
+  
 env:
   xcompile_vars: 'CC=arm-linux-musleabihf-gcc CXX=arm-linux-musleabihf-g++ INCLUDE="-I/usr/arm-linux-musleabihf/include/"'
 
