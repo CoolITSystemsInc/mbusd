@@ -20,12 +20,21 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
+    
     - name: Set up cross-compiler
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        repo: coolitsystemsinc/cdu-build
+        github_token: ${{ secrets.ACTIONS_AUTH }}        
+        workflow: musl-artifact.yaml
+        workflow_conclusion: success
+        name: arm-linux-musleabihf-cross
+        path: .
+
+    - name: Copy cross-compiler to usr folder
       run: |
-        wget https://musl.cc/arm-linux-musleabihf-cross.tgz
-        tar -zxf arm-linux-musleabihf-cross.tgz
-        sudo cp -r arm-linux-musleabihf-cross/* /usr/
+        tar -xvf arm-linux-musleabihf-cross.tgz
+        sudo cp -r ./arm-linux-musleabihf-cross/* /usr/
 
     - name: Compile mbusd
       run: |
