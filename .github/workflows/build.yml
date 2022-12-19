@@ -9,7 +9,8 @@ on:
     branches:
       - master
   schedule:
-      - cron: "0 9 * * 0"
+    - cron: "0 9 * * 0"
+  workflow_dispatch:
   
 env:
   xcompile_vars: 'CC=arm-linux-musleabihf-gcc CXX=arm-linux-musleabihf-g++ INCLUDE="-I/usr/arm-linux-musleabihf/include/"'
