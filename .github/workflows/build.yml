@@ -11,13 +11,18 @@ on:
   schedule:
     - cron: "0 9 * * 0"
   workflow_dispatch:
-  
-env:
-  xcompile_vars: 'CC=arm-linux-musleabihf-gcc CXX=arm-linux-musleabihf-g++ INCLUDE="-I/usr/arm-linux-musleabihf/include/"'
 
 jobs:
   build-mbusd:
     runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        arch:
+          - armv7l
+          - arm
+    env:   
+      xcompile_vars: 'CC=${{matrix.arch}}-linux-musleabihf-gcc CXX=${{matrix.arch}}-linux-musleabihf-g++ INCLUDE="-I/usr/${{matrix.arch}}-linux-musleabihf/include/"'
 
     steps:
     - uses: actions/checkout@v2
@@ -29,24 +34,24 @@ jobs:
         github_token: ${{ secrets.ACTIONS_AUTH }}        
         workflow: musl-artifact.yaml
         workflow_conclusion: success
-        name: arm-linux-musleabihf-cross
+        name: ${{ matrix.arch }}-linux-musleabihf-cross
         path: .
 
     - name: Copy cross-compiler to usr folder
       run: |
-        tar -xvf arm-linux-musleabihf-cross.tgz
-        sudo cp -r ./arm-linux-musleabihf-cross/* /usr/
+        tar -xvf ${{ matrix.arch }}-linux-musleabihf-cross.tgz
+        sudo cp -r ./${{ matrix.arch }}-linux-musleabihf-cross/* /usr/
 
     - name: Compile mbusd
       run: |
         chmod +x *
         autoreconf -if
-        ./configure --prefix=/usr/arm-linux-musleabihf/ --host=arm-linux-musleabihf
+        ./configure --prefix=/usr/${{ matrix.arch }}-linux-musleabihf/ --host=${{ matrix.arch }}-linux-musleabihf
         sudo make install ${{ env.xcompile_vars }}
-        ls -alR /usr/arm-linux-musleabihf/
+        ls -alR /usr/${{ matrix.arch }}-linux-musleabihf/
     
     - name: Upload mbusd binary
       uses: actions/upload-artifact@v2
       with:
-        name: mbusd
-        path: /usr/arm-linux-musleabihf/bin/mbusd
+        name: mbusd-${{ matrix.arch }}
+        path: /usr/${{ matrix.arch }}-linux-musleabihf/bin/mbusd
