@@ -283,16 +283,7 @@ main(int argc, char *argv[])
 	}
 	break;
       case 'A': {
-        struct in_addr addr;
-	for(char *p = optarg; *p; ++p) *p = tolower(*p);
-	if(streq(optarg, "any") || streq(optarg, "all") || streq(optarg, "none")) {
-	  cfg.serverbind[0] = 0;
-        } else if(inet_aton(optarg, &addr)) {
-          strncpy(cfg.serverbind, optarg, INTBUFSIZE);
-	} else {
-	  printf("%s is not a valid IP address\n", optarg);
-	  exit(-1);
-	}
+        strncpy(cfg.serveraddr, optarg, INTBUFSIZE);
 	break;
 	}
       case 'P':
