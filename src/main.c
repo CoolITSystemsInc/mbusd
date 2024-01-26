@@ -283,7 +283,7 @@ main(int argc, char *argv[])
 	}
 	break;
       case 'A': {
-        strncpy(cfg.serveraddr, optarg, INTBUFSIZE);
+        strncpy(cfg.serverbind, optarg, INTBUFSIZE);
 	break;
 	}
       case 'P':
