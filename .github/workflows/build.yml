@@ -33,7 +33,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: mbusd
-        path: /usr/arm-linux-musleabihf/bin/mbusd
+        path: /home/runner/work/mbusd/mbusd/bin/mbusd
 
     - name: Install test dependencies
       run: |
