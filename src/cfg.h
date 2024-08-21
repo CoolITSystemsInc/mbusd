@@ -48,6 +48,8 @@ typedef struct
   /* log file name */
   char logname[INTBUFSIZE + 1];
 #endif
+  /* PID file name */
+  char pidname[INTBUFSIZE + 1];
   /* tty port name */
   char ttyport[INTBUFSIZE + 1];
   /* tty speed */
