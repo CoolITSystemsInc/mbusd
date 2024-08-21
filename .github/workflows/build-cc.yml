@@ -50,4 +50,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: mbusd
-        path: /home/runner/work/mbusd/mbusd/build/mbusd
+        path: /home/runner/work/mbusd/mbusd/
