@@ -47,7 +47,9 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: Make
-      run: make
+      run: |
+        cd /home/runner/work/mbusd/mbusd/build
+        make
       
     - name: Upload mbusd binary
       uses: actions/upload-artifact@v3
