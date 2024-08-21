@@ -12,6 +12,7 @@ on:
       - cron: "0 9 * * 0"
   
 env:
+  BUILD_TYPE: Release
   xcompile_vars: 'CC=arm-linux-musleabihf-gcc CXX=arm-linux-musleabihf-g++ INCLUDE="-I/usr/arm-linux-musleabihf/include/"'
 
 jobs:
