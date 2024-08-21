@@ -35,7 +35,22 @@ jobs:
       run: |
         tar -xvf arm-linux-musleabihf-cross.tgz
         sudo cp -r ./arm-linux-musleabihf-cross/* /usr/
+        
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
+    - name: Build
+      # Build your program with the given configuration
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: Upload mbusd binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: mbusd
+        path: /home/runner/work/mbusd/mbusd/build/mbusd
+      
     - name: Compile mbusd
       run: |
         chmod +x *
@@ -43,9 +58,3 @@ jobs:
         ./configure --prefix=/usr/arm-linux-musleabihf/ --host=arm-linux-musleabihf
         sudo make install ${{ env.xcompile_vars }}
         ls -alR /usr/arm-linux-musleabihf/
-    
-    - name: Upload mbusd binary
-      uses: actions/upload-artifact@v3
-      with:
-        name: mbusd
-        path: /usr/arm-linux-musleabihf/bin/mbusd
