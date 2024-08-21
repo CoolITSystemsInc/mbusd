@@ -13,7 +13,7 @@ on:
   
 env:
   BUILD_TYPE: Release
-  xcompile_vars: 'CC=arm-linux-musleabihf-gcc CXX=arm-linux-musleabihf-g++ INCLUDE="-I/usr/arm-linux-musleabihf/include/"'
+  xcompile_vars: 'INCLUDE="-I/usr/arm-linux-musleabihf/include/"'
 
 jobs:
   build-mbusd:
@@ -51,11 +51,3 @@ jobs:
       with:
         name: mbusd
         path: /home/runner/work/mbusd/mbusd/build/mbusd
-      
-    - name: Compile mbusd
-      run: |
-        chmod +x *
-        autoreconf -if
-        ./configure --prefix=/usr/arm-linux-musleabihf/ --host=arm-linux-musleabihf
-        sudo make install ${{ env.xcompile_vars }}
-        ls -alR /usr/arm-linux-musleabihf/
