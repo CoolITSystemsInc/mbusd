@@ -23,7 +23,7 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Set up cross-compiler
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v6
       with:
         repo: coolitsystemsinc/cdu-build
         github_token: ${{ secrets.ACTIONS_AUTH }}        
@@ -52,7 +52,7 @@ jobs:
         make
       
     - name: Upload mbusd binary
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: mbusd
         path: ${{github.workspace}}/build/mbusd
