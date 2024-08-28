@@ -45,6 +45,10 @@
 #  include "log.h"
 #endif
 
+#ifndef streq
+#  define streq(X,Y) (0!=strcmp(X,Y))
+#endif
+
 extern char logfullname[];
 int isdaemon = TRUE;
 
@@ -116,11 +120,12 @@ usage(char *exename)
 #ifdef TRXCTL
    "             [-t] [-r] [-y sysfsfile] [-Y sysfsfile]\n"
 #endif
-   "             [-A address] [-P port] [-C maxconn] [-N retries]\n"
+   "             [-A address] [-P port] [-C maxconn] [-I pid] [-N retries]\n"
    "             [-R pause] [-W wait] [-T timeout] [-b]\n\n"
    "Options:\n"
    "  -h         : this help\n"
    "  -d         : don't fork (non-daemonize)\n"
+   "  -I pid     : path to register PID to\n"
 #ifdef LOG
    "  -L logfile : set log file name (default is %s%s, \n"
    "               '-' for logging to STDOUT only)\n"
@@ -202,7 +207,7 @@ main(int argc, char *argv[])
 #ifdef LOG
                "v:L:"
 #endif
-               "p:s:m:A:P:C:N:R:W:T:c:b")) != RC_ERR)
+               "p:s:m:A:P:C:I:N:R:W:T:c:b")) != RC_ERR)
   {
     switch (rc)
     {
@@ -348,6 +353,9 @@ main(int argc, char *argv[])
           exit(-1);
         }
         break;
+      case 'I':
+        strncpy(cfg.pidname, optarg, INTBUFSIZE);
+        break;
       case 'N':
         cfg.maxtry = strtoul(optarg, NULL, 0);
         if (cfg.maxtry > MAX_MAXTRY)
@@ -422,7 +430,24 @@ main(int argc, char *argv[])
 #endif
     exit(rc);
   }
+  if (strlen(cfg.pidname)) {
+    int fd; FILE *PID = NULL;
 
+    if(!rc) rc = (int)getpid();
+
+    logw(2, "%s: registering pid to '%s'", exename, cfg.pidname);
+    unlink(cfg.pidname);
+    fd = open(cfg.pidname, O_CREAT | O_EXCL | O_WRONLY, 0600);
+    if (fd != -1) PID = fdopen( fd, "w" );
+    if (PID == NULL) {
+      printf("%s: unable to open PID file\n", exename);
+      exit(-1);
+    }
+
+    fprintf(PID, "%d\n", rc);
+    fclose(PID);
+    close(fd);
+  }
   conn_loop();
   err = errno;
 #ifdef LOG
