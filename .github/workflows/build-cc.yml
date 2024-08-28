@@ -4,17 +4,13 @@ on:
   push:
     branches:
       - master
-      - cicd
   pull_request:
     branches:
       - master
-  schedule:
-      - cron: "0 9 * * 0"
   
 env:
   BUILD_TYPE: Release
-  xcompile_vars: 'INCLUDE="-I/usr/arm-linux-musleabihf/include/"'
-
+  
 jobs:
   build-mbusd:
     runs-on: ubuntu-latest
@@ -30,6 +26,7 @@ jobs:
         workflow: musl-artifact.yaml
         workflow_conclusion: success
         name: arm-linux-musleabihf-cross
+        allow_forks: true
         path: .
 
     - name: Copy cross-compiler to usr folder
