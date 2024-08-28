@@ -4,16 +4,13 @@ on:
   push:
     branches:
       - master
-      - cicd
   pull_request:
     branches:
       - master
-  schedule:
-      - cron: "0 9 * * 0"
   
 env:
-  xcompile_vars: 'CC=arm-linux-musleabihf-gcc CXX=arm-linux-musleabihf-g++ INCLUDE="-I/usr/arm-linux-musleabihf/include/"'
-
+  BUILD_TYPE: Release
+  
 jobs:
   build-mbusd:
     runs-on: ubuntu-latest
@@ -22,30 +19,37 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Set up cross-compiler
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v6
       with:
         repo: coolitsystemsinc/cdu-build
         github_token: ${{ secrets.ACTIONS_AUTH }}        
         workflow: musl-artifact.yaml
         workflow_conclusion: success
         name: arm-linux-musleabihf-cross
+        allow_forks: true
         path: .
 
     - name: Copy cross-compiler to usr folder
       run: |
         tar -xvf arm-linux-musleabihf-cross.tgz
-        sudo cp -r ./arm-linux-musleabihf-cross/* /usr/
+        sudo cp -r ./arm-linux-musleabihf-cross /usr/
+        
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/arm_linux_gnueabihf.cmake
 
-    - name: Compile mbusd
+    - name: Build the cmake
+      # Build your program with the given configuration
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: Make
       run: |
-        chmod +x *
-        autoreconf -if
-        ./configure --prefix=/usr/arm-linux-musleabihf/ --host=arm-linux-musleabihf
-        sudo make install ${{ env.xcompile_vars }}
-        ls -alR /usr/arm-linux-musleabihf/
-    
+        cd ${{github.workspace}}/build
+        make
+      
     - name: Upload mbusd binary
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: mbusd
-        path: /usr/arm-linux-musleabihf/bin/mbusd
+        path: ${{github.workspace}}/build/mbusd
