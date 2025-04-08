@@ -16,7 +16,7 @@ jobs:
       matrix:
         arch:
           - arm-linux-musleabihf
-          #- aarch64-linux-musl
+          - aarch64-linux-musl
     
     runs-on: ubuntu-latest
 
