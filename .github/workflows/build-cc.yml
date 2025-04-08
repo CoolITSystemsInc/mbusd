@@ -4,44 +4,49 @@ on:
   push:
     branches:
       - master
+      - ci*
   pull_request:
     branches:
       - master
   
-env:
-  BUILD_TYPE: Release
-  
 jobs:
   build-mbusd:
+    name: Run cross-compiler download and verification for each architecture
+    strategy:
+      matrix:
+        arch:
+          - arm-linux-musleabihf
+          - aarch64-linux-musl
+    
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set up cross-compiler
-      uses: dawidd6/action-download-artifact@v6
+    - name: Download musl-cross-compiler library from release
+      id: musl-cross-compiler
+      uses: robinraju/release-downloader@v1.8
       with:
-        repo: coolitsystemsinc/cdu-build
-        github_token: ${{ secrets.ACTIONS_AUTH }}        
-        workflow: musl-artifact.yaml
-        workflow_conclusion: success
-        name: arm-linux-musleabihf-cross
-        allow_forks: true
-        path: .
+        repository: coolitsystemsinc/cdu-lib
+        latest: true
+        token: ${{ secrets.ACTIONS_AUTH }}
+        fileName: "${{ matrix.arch }}-cross.tgz"
+        extract: false
+        out-file-path: .
 
     - name: Copy cross-compiler to usr folder
       run: |
-        tar -xvf arm-linux-musleabihf-cross.tgz
-        sudo cp -r ./arm-linux-musleabihf-cross /usr/
+        tar -xvf ${{ matrix.arch }}-cross.tgz
+        sudo cp -r ./${{ matrix.arch }}-cross/* /usr/
         
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/arm_linux_gnueabihf.cmake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/${{ matrix.arch }}.cmake
 
     - name: Build the cmake
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/build --config Release
 
     - name: Make
       run: |
@@ -51,5 +56,5 @@ jobs:
     - name: Upload mbusd binary
       uses: actions/upload-artifact@v4
       with:
-        name: mbusd
+        name: mbusd-${{ matrix.arch }}
         path: ${{github.workspace}}/build/mbusd
