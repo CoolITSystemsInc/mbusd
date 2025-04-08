@@ -3,9 +3,9 @@ SET(CMAKE_SYSTEM_NAME Linux)
 SET(CMAKE_SYSTEM_PROCESSOR armhf)
 
 # specify the cross compiler
-SET(CMAKE_C_COMPILER   /usr/arm-linux-musleabihf-cross/bin/arm-linux-musleabihf-gcc)
+SET(CMAKE_C_COMPILER   /usr/bin/arm-linux-musleabihf-gcc)
 ## for c++ support `install g++-arm-linux-musleabihf`
-#SET(CMAKE_CXX_COMPILER /usr/arm-linux-musleabihf-cross/bin/arm-linux-musleabihf-g++)
+#SET(CMAKE_CXX_COMPILER /usr/bin/arm-linux-musleabihf-g++)
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
